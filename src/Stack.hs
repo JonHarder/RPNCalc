@@ -8,6 +8,9 @@ data Op = Mult
         | Plus
         | Minus
         | Pow
+        | Sin
+        | Cos
+        | Sqrt
 
 instance Show Op where
   show Plus = "+"
@@ -15,6 +18,9 @@ instance Show Op where
   show Mult = "*"
   show Div = "/"
   show Pow = "^"
+  show Sin = "sin"
+  show Cos = "cos"
+  show Sqrt = "sqrt"
 
 data Atom = Number Float | Operator Op
 
@@ -36,6 +42,12 @@ instance Fractional Atom where
 
 instance Floating Atom where
   (**) (Number a) (Number b) = Number (a**b)
+  sin (Number a) = Number (sin $ degToRad a)
+  cos (Number a) = Number (cos $ degToRad a)
+  sqrt (Number a) = Number $ sqrt a
+
+degToRad :: Floating a => a -> a
+degToRad a = 2*pi*a / 360
 
 type Stack = [Atom]
 
@@ -53,6 +65,9 @@ numArgs (Operator Minus) = 2
 numArgs (Operator Mult) = 2
 numArgs (Operator Div) = 2
 numArgs (Operator Pow) = 2
+numArgs (Operator Sin) = 1
+numArgs (Operator Cos) = 1
+numArgs (Operator Sqrt) = 1
 
 apply :: Stack -> Atom
 apply (op:xs) = case op of
@@ -61,6 +76,9 @@ apply (op:xs) = case op of
   Operator Mult -> xs !! 1 * head xs
   Operator Div -> xs !! 1 / head xs
   Operator Pow -> xs !! 1 ** head xs
+  Operator Sin -> sin $ head xs
+  Operator Cos -> cos $ head xs
+  Operator Sqrt -> sqrt $ head xs
 
 isOperator :: Atom -> Bool
 isOperator (Operator _) = True
@@ -74,20 +92,6 @@ push s a = do
   modifyIORef s (a:)
   when (isOperator a) $
     modifyIORef s evalStack
-
-tokenize :: Floating a => Atom -> a -> a -> a
-tokenize (Operator Plus)  = (+)
-tokenize (Operator Minus) = (-)
-tokenize (Operator Mult)  = (*)
-tokenize (Operator Div)   = (/)
-tokenize (Operator Pow)   = (**)
-tokenize (Number _)       = error "Cannot tokenize a number"
-
-takeThrough :: (a -> Bool) -> [a] -> [a]
-takeThrough p xs = takeWhile p xs ++ [head $ dropWhile p xs]
-
-takeLast :: Int -> [a] -> [a]
-takeLast n = reverse . take n . reverse
 
 readNumber :: Atom -> Float
 readNumber (Number n) = n

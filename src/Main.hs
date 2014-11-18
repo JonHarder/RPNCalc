@@ -1,6 +1,6 @@
 import Text.ParserCombinators.Parsec
 import Data.IORef
-import Control.Monad (forM_, unless)
+import Control.Monad (unless)
 import System.IO
 import System.Environment
 

@@ -19,5 +19,23 @@ operator = do
       '^' -> Pow
       _   -> error $ "unrecognized opperator: " ++ [c]
 
+mathFun :: Parser Atom
+mathFun = try sinP <|> try cosP <|> sqrtP
+
+cosP :: Parser Atom
+cosP = do
+  string "cos"
+  return $ Operator Cos
+
+sqrtP :: Parser Atom
+sqrtP = do
+  string "sqrt"
+  return $ Operator Sqrt
+
+sinP :: Parser Atom
+sinP = do
+  string "sin"
+  return $ Operator Sin
+
 atom :: Parser Atom
-atom = number <|> operator
+atom = number <|> operator <|> mathFun
