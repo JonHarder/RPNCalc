@@ -40,31 +40,40 @@ instance Floating Atom where
 type Stack = [Atom]
 
 -- modifies stack by applying stack's head operator to values
+-- current evalStack assumes all operators take 2 arguments
+-- new one will figure it out based on which operator is used
 evalStack :: Stack -> Stack
-evalStack s = let (Operator o) = head s
-                  x = s !! 2
-                  y = s !! 1
-              in case o of
-                  Plus  -> x + y  : drop 3 s
-                  Minus -> x - y  : drop 3 s
-                  Mult  -> x * y  : drop 3 s
-                  Div   -> x / y  : drop 3 s
-                  Pow   -> x ** y : drop 3 s
+evalStack s = let n = numArgs (head s) + 1
+                  newval = apply $ take n s
+              in newval : drop n s
+
+numArgs :: Atom -> Int
+numArgs (Operator Plus) = 2
+numArgs (Operator Minus) = 2
+numArgs (Operator Mult) = 2
+numArgs (Operator Div) = 2
+numArgs (Operator Pow) = 2
+
+apply :: Stack -> Atom
+apply (op:xs) = case op of
+  Operator Plus -> xs !! 1 + head xs
+  Operator Minus -> xs !! 1 - head xs
+  Operator Mult -> xs !! 1 * head xs
+  Operator Div -> xs !! 1 / head xs
+  Operator Pow -> xs !! 1 ** head xs
+
+isOperator :: Atom -> Bool
+isOperator (Operator _) = True
+isOperator _ = False
 
 -- adds new value to stack, if number
 -- otherwise eval stack with operator added,
 -- adding the result to the top of the stack instead
 push :: IORef Stack -> Atom -> IO ()
-push s a@(Number n) = do
+push s a = do
   modifyIORef s (a:)
-push s a@(Operator _) = do
-  modifyIORef s (a:)
-  modifyIORef s evalStack
-
-peak :: IORef Stack -> IO Atom
-peak s = do
-  stack <- readIORef s
-  return $ head stack
+  when (isOperator a) $
+    modifyIORef s evalStack
 
 tokenize :: Floating a => Atom -> a -> a -> a
 tokenize (Operator Plus)  = (+)
@@ -83,7 +92,6 @@ takeLast n = reverse . take n . reverse
 readNumber :: Atom -> Float
 readNumber (Number n) = n
 
--- ERROR: always displays head of stack as answer
 reduceStack :: Stack -> IO Float
 reduceStack stack = do
   ref <- newIORef ([] :: Stack)
