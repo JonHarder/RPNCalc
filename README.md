@@ -6,7 +6,7 @@ Supports both an interactive "repl" like mode, and a batch
 mode taken argument.
 
 ## Usage
-RPN -- starts interactive calc mode: press enter after every value/operator
+RPN starts interactive calc mode: press enter after every value/operator
 
 RPN CALCULATION -- runs the CALCULATION and prints the result non interactively
 
@@ -14,6 +14,8 @@ RPN CALCULATION -- runs the CALCULATION and prints the result non interactively
 ### Batch Mode
     RPN "1 8 3 + 2 ^ -"
     -120.0
+
+Or Alternatively, in
 
 ### Interactive Mode
     $ RPN
