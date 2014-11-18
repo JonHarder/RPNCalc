@@ -1,6 +1,6 @@
 import Text.ParserCombinators.Parsec
 import Data.IORef
-import Control.Monad (unless)
+import Control.Monad (forM_, unless)
 import System.IO
 import System.Environment
 
@@ -18,15 +18,19 @@ parseAtom str = case parse atom "Parsing Calculation" str of
   Left e -> error $ show e
   Right a -> a
 
+
 main :: IO ()
 main = do
   args <- getArgs
   env <- newIORef ([] :: Stack)
   case length args of
    0 -> loop env
-   _ -> let argStack = map parseAtom args
+   _ -> let argStack = map parseAtom $ words $ head args
         in reduceStack argStack >>= print
  where loop stack = do
          str <- promptLine "RPN>> "
-         unless ((== "quit") str) $
-           push stack Interactive (parseAtom str) >> loop stack
+         unless ((== "quit") str) $ do
+           -- push stack Interactive (parseAtom str)
+           push stack NoInteractive (parseAtom str)
+           printStack stack
+           loop stack

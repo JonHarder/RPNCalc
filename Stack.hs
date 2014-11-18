@@ -1,9 +1,9 @@
 module Stack where
 
 import Data.IORef
-import Control.Monad (forM_)
+import Control.Monad (when, forM_)
 
-data InteractFlag = Interactive | NoInteractive
+data InteractFlag = Interactive | NoInteractive deriving Eq
 
 data Op = Mult
         | Div
@@ -54,18 +54,18 @@ evalStack s = let (Operator o) = head s
                   Pow   -> x ** y : drop 3 s
 
 -- adds new value to stack, if number
+-- otherwise eval stack with operator added,
+-- adding the result to the top of the stack instead
 push :: IORef Stack -> InteractFlag -> Atom -> IO ()
-push s Interactive a@(Number n) = do
+push s interaction a@(Number n) = do
   modifyIORef s (a:)
-  print n
-push s NoInteractive a@(Number n) = modifyIORef s (a:)
-push s Interactive a@(Operator _) = do
-  modifyIORef s (a:)
-  modifyIORef s evalStack
-  peak s >>= print
-push s NoInteractive a@(Operator _) = do
+  when (interaction == Interactive) $
+    print n
+push s interaction a@(Operator _) = do
   modifyIORef s (a:)
   modifyIORef s evalStack
+  when (interaction == Interactive) $
+    peak s >>= print
 
 peak :: IORef Stack -> IO Atom
 peak s = do
@@ -83,18 +83,19 @@ tokenize (Number _)       = error "Cannot tokenize a number"
 takeThrough :: (a -> Bool) -> [a] -> [a]
 takeThrough p xs = takeWhile p xs ++ [head $ dropWhile p xs]
 
-computeOperation :: Stack -> Atom
-computeOperation (x:y:op:[]) = tokenize op x y
-
 takeLast :: Int -> [a] -> [a]
 takeLast n = reverse . take n . reverse
 
 readNumber :: Atom -> Float
 readNumber (Number n) = n
 
+-- ERROR: always displays head of stack as answer
 reduceStack :: Stack -> IO Float
 reduceStack stack = do
   ref <- newIORef ([] :: Stack)
   forM_ stack $ \a -> push ref NoInteractive a
   res <- readIORef ref
   (return . readNumber . head) res
+
+printStack :: IORef Stack -> IO ()
+printStack s = readIORef s >>= \stack -> forM_ stack $ \a -> print a
