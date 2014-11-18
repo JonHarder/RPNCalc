@@ -3,8 +3,6 @@ module Stack where
 import Data.IORef
 import Control.Monad (when, forM_)
 
-data InteractFlag = Interactive | NoInteractive deriving Eq
-
 data Op = Mult
         | Div
         | Plus
@@ -56,16 +54,12 @@ evalStack s = let (Operator o) = head s
 -- adds new value to stack, if number
 -- otherwise eval stack with operator added,
 -- adding the result to the top of the stack instead
-push :: IORef Stack -> InteractFlag -> Atom -> IO ()
-push s interaction a@(Number n) = do
+push :: IORef Stack -> Atom -> IO ()
+push s a@(Number n) = do
   modifyIORef s (a:)
-  when (interaction == Interactive) $
-    print n
-push s interaction a@(Operator _) = do
+push s a@(Operator _) = do
   modifyIORef s (a:)
   modifyIORef s evalStack
-  when (interaction == Interactive) $
-    peak s >>= print
 
 peak :: IORef Stack -> IO Atom
 peak s = do
@@ -93,7 +87,7 @@ readNumber (Number n) = n
 reduceStack :: Stack -> IO Float
 reduceStack stack = do
   ref <- newIORef ([] :: Stack)
-  forM_ stack $ \a -> push ref NoInteractive a
+  forM_ stack $ \a -> push ref a
   res <- readIORef ref
   (return . readNumber . head) res
 

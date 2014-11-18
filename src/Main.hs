@@ -30,7 +30,6 @@ main = do
  where loop stack = do
          str <- promptLine "RPN>> "
          unless ((== "quit") str) $ do
-           -- push stack Interactive (parseAtom str)
-           push stack NoInteractive (parseAtom str)
+           push stack (parseAtom str)
            printStack stack
            loop stack
