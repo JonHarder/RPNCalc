@@ -46,4 +46,5 @@ Or Alternatively, in
 ## TODO
  * add support for entering more than one value per line in interactive mode
  * variables
+ * deal with functions that take more or less than 2 arguments
  * more math functions: sin, sqrt, etc.

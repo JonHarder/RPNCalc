@@ -106,6 +106,6 @@ printStack :: IORef Stack -> IO ()
 -- printStack s = readIORef s >>= \stack -> forM_ stack $ \a -> print a
 printStack s = do
   stack <- readIORef s
-  forM_ (numberify stack) $ \a -> do
+  forM_ (reverse $ numberify stack) $ \a -> do
     let (n, a') = a
     putStrLn $ show n ++ ":\t" ++ show a'
