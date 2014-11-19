@@ -48,6 +48,7 @@ Or Alternatively, in
  * variables
 
 ## DONE
- * deal with functions that take more or less than 2 arguments
+ * dealt with functions that take more or less than 2 arguments
  * more math functions: sin, sqrt, etc. -- work in progress
  * added clear functions which wipes the stack
+ * added support for reading negative numbers

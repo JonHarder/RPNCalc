@@ -104,9 +104,7 @@ reduceStack stack = do
   (return . readNumber . head) res
 
 numberify :: [a] -> [(Int, a)]
-numberify = go 1
-  where go _ [] = []
-        go n (x:xs) = (n,x) : go (n+1) xs
+numberify = zip [1..]
 
 printStack :: IORef Stack -> IO ()
 -- printStack s = readIORef s >>= \stack -> forM_ stack $ \a -> print a

@@ -1,12 +1,26 @@
 module Parser where
 
 import Text.ParserCombinators.Parsec
-import Control.Applicative ((<$>))
+import Control.Applicative hiding ((<|>))
 
 import Stack
 
-number :: Parser Atom
-number = (Number . read) <$> many1 (digit <|> char '.')
+number :: Parser String
+number = many1 digit
+
+minus :: Parser String
+minus = (:) <$> char '-' <*> number
+
+integer :: Parser String
+integer = {- plus <|>  -} minus <|> number
+
+float :: Parser Float
+float = fmap rd $ (++) <$> integer <*> decimal
+  where rd = read :: String -> Float
+        decimal = option "" $ (:) <$> char '.' <*> number
+
+atomNumber :: Parser Atom
+atomNumber = Number <$> float
 
 operator :: Parser Atom
 operator = do
@@ -43,4 +57,4 @@ sinP = do
   return $ Operator Sin
 
 atom :: Parser Atom
-atom = number <|> operator <|> mathFun <|> constant
+atom = atomNumber <|> operator <|> mathFun <|> constant
