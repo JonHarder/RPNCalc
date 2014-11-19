@@ -22,6 +22,11 @@ operator = do
 mathFun :: Parser Atom
 mathFun = try sinP <|> try cosP <|> sqrtP
 
+constant :: Parser Atom
+constant = do
+  string "pi"
+  return $ Number 3.145926
+
 cosP :: Parser Atom
 cosP = do
   string "cos"
@@ -38,4 +43,4 @@ sinP = do
   return $ Operator Sin
 
 atom :: Parser Atom
-atom = number <|> operator <|> mathFun
+atom = number <|> operator <|> mathFun <|> constant

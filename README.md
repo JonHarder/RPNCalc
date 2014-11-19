@@ -50,3 +50,4 @@ Or Alternatively, in
 ## DONE
  * deal with functions that take more or less than 2 arguments
  * more math functions: sin, sqrt, etc. -- work in progress
+ * added clear functions which wipes the stack

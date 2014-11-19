@@ -1,6 +1,6 @@
 import Text.ParserCombinators.Parsec
 import Data.IORef
-import Control.Monad (unless)
+import Control.Monad (when, unless)
 import System.IO
 import System.Environment
 
@@ -29,7 +29,11 @@ main = do
         in reduceStack argStack >>= print
  where loop stack = do
          str <- promptLine "RPN>> "
-         unless ((== "quit") str) $ do
-           push stack (parseAtom str)
-           printStack stack
-           loop stack
+         unless ((== "quit") str) $
+           if str == "clear"
+              then do writeIORef stack []
+                      loop stack
+
+              else do push stack (parseAtom str)
+                      printStack stack
+                      loop stack
