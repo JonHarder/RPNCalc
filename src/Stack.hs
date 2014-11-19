@@ -60,25 +60,27 @@ evalStack s = let n = numArgs (head s) + 1
               in newval : drop n s
 
 numArgs :: Atom -> Int
-numArgs (Operator Plus) = 2
-numArgs (Operator Minus) = 2
-numArgs (Operator Mult) = 2
-numArgs (Operator Div) = 2
-numArgs (Operator Pow) = 2
-numArgs (Operator Sin) = 1
-numArgs (Operator Cos) = 1
-numArgs (Operator Sqrt) = 1
+numArgs (Operator op) = case op of
+  Plus -> 2
+  Minus -> 2
+  Mult -> 2
+  Div -> 2
+  Pow -> 2
+  Sin -> 1
+  Cos -> 1
+  Sqrt -> 1
 
 apply :: Stack -> Atom
-apply (op:xs) = case op of
-  Operator Plus -> xs !! 1 + head xs
-  Operator Minus -> xs !! 1 - head xs
-  Operator Mult -> xs !! 1 * head xs
-  Operator Div -> xs !! 1 / head xs
-  Operator Pow -> xs !! 1 ** head xs
-  Operator Sin -> sin $ head xs
-  Operator Cos -> cos $ head xs
-  Operator Sqrt -> sqrt $ head xs
+apply (op:xs) = let (Operator o) = op
+                in case o of
+                    Plus -> xs !! 1 + head xs
+                    Minus -> xs !! 1 - head xs
+                    Mult -> xs !! 1 * head xs
+                    Div -> xs !! 1 / head xs
+                    Pow -> xs !! 1 ** head xs
+                    Sin -> sin $ head xs
+                    Cos -> cos $ head xs
+                    Sqrt -> sqrt $ head xs
 
 isOperator :: Atom -> Bool
 isOperator (Operator _) = True
@@ -107,7 +109,6 @@ numberify :: [a] -> [(Int, a)]
 numberify = zip [1..]
 
 printStack :: IORef Stack -> IO ()
--- printStack s = readIORef s >>= \stack -> forM_ stack $ \a -> print a
 printStack s = do
   stack <- readIORef s
   forM_ (reverse $ numberify stack) $ \a -> do
