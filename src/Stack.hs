@@ -60,9 +60,6 @@ degToRad a = 2*pi*a / 360
 
 type Stack = [Atom]
 
--- modifies stack by applying stack's head operator to values
--- current evalStack assumes all operators take 2 arguments
--- new one will figure it out based on which operator is used
 evalStack :: Stack -> Stack
 evalStack s = let n = numArgs (head s) + 1
                   newval = apply $ take n s
@@ -134,4 +131,5 @@ numberify :: [a] -> [(Int, a)]
 numberify = zip [1..]
 
 printStack :: Stack -> IO ()
-printStack = printf . showStack
+printStack (a:[]) = print a
+printStack s = printf . showStack $ s

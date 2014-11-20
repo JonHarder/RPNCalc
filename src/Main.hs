@@ -1,5 +1,5 @@
 import Text.ParserCombinators.Parsec
-import Data.IORef
+-- import Data.IORef
 import Control.Monad (when, unless)
 import System.IO
 import System.Environment
@@ -21,28 +21,18 @@ parseAtom str = case parse atom "Parsing Calculation" str of
 
 main :: IO ()
 main = do
-  arg <- fmap (words . head) getArgs
+  -- arg <- fmap (words . head) getArgs
+  arg <- getArgs
   case length arg of
-   0 -> undefined -- run interactively
-   -- else run in batch mode
-   _ -> let comp = map parseAtom arg
+   0 -> loop []
+   _ -> let comp = map parseAtom $ words $ head arg
         in print $ readNumber $ head $ reduceStack comp
-
--- main :: IO ()
--- main = do
---   args <- getArgs
---   env <- newIORef ([] :: Stack)
---   case length args of
---    0 -> loop env
---    _ -> let argStack = map parseAtom $ words $ head args
---         in reduceStack argStack >>= print
---  where loop stack = do
---          str <- promptLine "RPN>> "
---          unless ((== "quit") str) $
---            if str == "clear"
---               then do writeIORef stack []
---                       loop stack
-
---               else do push stack (parseAtom str)
---                       printStack stack
---                       loop stack
+ where loop :: Stack -> IO ()
+       loop s = do
+         str <- promptLine "RPN>> "
+         unless (str == "quit") $
+            if str == "clear"
+               then loop []
+               else let a = parseAtom str
+                        s' = push s a
+                    in printStack s' >> loop s'
