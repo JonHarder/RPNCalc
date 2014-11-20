@@ -15,8 +15,9 @@ runs the CALCULATION and prints the result non interactively
 
 ## Example
 ### Batch Mode
-    RPN "1 8 3 + 2 ^ -"
+    $ RPN "1 8 3 + 2 ^ -"
     -120.0
+    $
 
 Or Alternatively, in
 
