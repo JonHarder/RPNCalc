@@ -1,6 +1,5 @@
 import Text.ParserCombinators.Parsec
--- import Data.IORef
-import Control.Monad (when, unless)
+import Control.Monad (unless)
 import System.IO
 import System.Environment
 
@@ -21,7 +20,6 @@ parseAtom str = case parse atom "Parsing Calculation" str of
 
 main :: IO ()
 main = do
-  -- arg <- fmap (words . head) getArgs
   arg <- getArgs
   case length arg of
    0 -> loop []
