@@ -21,19 +21,28 @@ parseAtom str = case parse atom "Parsing Calculation" str of
 
 main :: IO ()
 main = do
-  args <- getArgs
-  env <- newIORef ([] :: Stack)
-  case length args of
-   0 -> loop env
-   _ -> let argStack = map parseAtom $ words $ head args
-        in reduceStack argStack >>= print
- where loop stack = do
-         str <- promptLine "RPN>> "
-         unless ((== "quit") str) $
-           if str == "clear"
-              then do writeIORef stack []
-                      loop stack
+  arg <- fmap (words . head) getArgs
+  case length arg of
+   0 -> undefined -- run interactively
+   -- else run in batch mode
+   _ -> let comp = map parseAtom arg
+        in print $ readNumber $ head $ reduceStack comp
 
-              else do push stack (parseAtom str)
-                      printStack stack
-                      loop stack
+-- main :: IO ()
+-- main = do
+--   args <- getArgs
+--   env <- newIORef ([] :: Stack)
+--   case length args of
+--    0 -> loop env
+--    _ -> let argStack = map parseAtom $ words $ head args
+--         in reduceStack argStack >>= print
+--  where loop stack = do
+--          str <- promptLine "RPN>> "
+--          unless ((== "quit") str) $
+--            if str == "clear"
+--               then do writeIORef stack []
+--                       loop stack
+
+--               else do push stack (parseAtom str)
+--                       printStack stack
+--                       loop stack

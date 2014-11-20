@@ -1,7 +1,10 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Stack where
 
-import Data.IORef
-import Control.Monad (when, forM_)
+-- import Control.Monad (forM_)
+import Data.List (intercalate)
+import Text.Printf
 
 data Op = Mult
         | Div
@@ -23,6 +26,12 @@ instance Show Op where
   show Sqrt = "sqrt"
 
 data Atom = Number Float | Operator Op
+
+showStack :: Stack -> String
+showStack s =
+    let numbered = (reverse $ numberify s)
+        stringed = map (\(n,a') -> show n ++ ":\t" ++ show a') numbered
+    in intercalate "\n" stringed ++ "\n"
 
 instance Show Atom where
   show (Number f) = show f
@@ -89,28 +98,40 @@ isOperator _ = False
 -- adds new value to stack, if number
 -- otherwise eval stack with operator added,
 -- adding the result to the top of the stack instead
-push :: IORef Stack -> Atom -> IO ()
-push s a = do
-  modifyIORef s (a:)
-  when (isOperator a) $
-    modifyIORef s evalStack
+push :: Stack -> Atom -> Stack
+push s a =
+  if isOperator a
+     then evalStack (a:s)
+     else a:s
 
 readNumber :: Atom -> Float
 readNumber (Number n) = n
 
-reduceStack :: Stack -> IO Float
-reduceStack stack = do
-  ref <- newIORef ([] :: Stack)
-  forM_ stack $ \a -> push ref a
-  res <- readIORef ref
-  (return . readNumber . head) res
+singleton :: [a] -> Bool
+singleton (_:[]) = True
+singleton _ = False
+
+reduceStack :: Stack -> Stack
+reduceStack = until singleton reduce
+
+reduce :: Stack -> Stack
+reduce s = let (n, a) = findOperator s
+               args = numArgs a
+               comp = take (args+1) $ drop (n-args) s
+               before = take (n-args) s
+               after = drop (n+1) s
+           in before ++ [apply (reverse comp)] ++ after
+
+
+-- returns the index of the stack and which operator it is
+findOperator :: Stack -> (Int, Atom)
+findOperator = go 0
+  where go n s = if isOperator (s !! n)
+                    then (n, s !! n)
+                    else go (n+1) s
 
 numberify :: [a] -> [(Int, a)]
 numberify = zip [1..]
 
-printStack :: IORef Stack -> IO ()
-printStack s = do
-  stack <- readIORef s
-  forM_ (reverse $ numberify stack) $ \a -> do
-    let (n, a') = a
-    putStrLn $ show n ++ ":\t" ++ show a'
+printStack :: Stack -> IO ()
+printStack = printf . showStack
