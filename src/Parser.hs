@@ -38,12 +38,12 @@ mathFun = try sinP <|> try cosP <|> sqrtP
 
 piP :: Parser Atom
 piP = do
-  string "pi"
+  _ <- string "pi"
   return $ Number 3.145926
 
 eP :: Parser Atom
 eP = do
-  string "e"
+  _ <- string "e"
   return $ Number 2.7181818
 
 constants :: Parser Atom
@@ -52,18 +52,18 @@ constants = piP <|> eP
 
 cosP :: Parser Atom
 cosP = do
-  string "cos"
+  _ <- string "cos"
   return $ Operator Cos
 
 sqrtP :: Parser Atom
 sqrtP = do
-  string "sqrt"
+  _ <- string "sqrt"
   return $ Operator Sqrt
 
 sinP :: Parser Atom
 sinP = do
-  string "sin"
+  _ <- string "sin"
   return $ Operator Sin
 
 atom :: Parser Atom
-atom = atomNumber <|> operator <|> mathFun <|> constants
+atom = try atomNumber <|> try operator <|> try mathFun <|> constants

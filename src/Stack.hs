@@ -2,7 +2,6 @@
 
 module Stack where
 
--- import Control.Monad (forM_)
 import Data.List (intercalate)
 import Text.Printf
 
@@ -66,6 +65,7 @@ evalStack s = let n = numArgs (head s) + 1
               in newval : drop n s
 
 numArgs :: Atom -> Int
+numArgs (Number _) = 0
 numArgs (Operator op) = case op of
   Plus -> 2
   Minus -> 2
@@ -77,6 +77,7 @@ numArgs (Operator op) = case op of
   Sqrt -> 1
 
 apply :: Stack -> Atom
+apply [] = error "Calculation is not well formed"
 apply (op:xs) = let (Operator o) = op
                 in case o of
                     Plus -> xs !! 1 + head xs
@@ -103,6 +104,7 @@ push s a =
 
 readNumber :: Atom -> Float
 readNumber (Number n) = n
+readNumber (Operator _) = error "Cant evaluate an operator to a number"
 
 singleton :: [a] -> Bool
 singleton (_:[]) = True
@@ -131,5 +133,4 @@ numberify :: [a] -> [(Int, a)]
 numberify = zip [1..]
 
 printStack :: Stack -> IO ()
-printStack (a:[]) = print a
-printStack s = printf . showStack $ s
+printStack = printf . showStack

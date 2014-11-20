@@ -44,7 +44,7 @@ Or Alternatively, in
     RPN>> -
     1:    -120.0
     RPN>> quit
-    $ 
+    $
 
 ## TODO
  * add support for entering more than one value per line in interactive mode
@@ -55,3 +55,5 @@ Or Alternatively, in
  * more math functions: sin, sqrt, etc. -- work in progress
  * added clear functions which wipes the stack
  * added support for reading negative numbers
+ * Refactored evaluation model to use pure Stack instead of IORefs
+ * fix improper parsing of minus symbol as poorly formed negative number
