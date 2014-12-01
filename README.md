@@ -50,6 +50,7 @@ Or Alternatively, in
 ## TODO
  * add support for entering more than one value per line in interactive mode
  * variables
+ * Fix impropper parsing of constants  ex. exit parses to e parses to 2.71.....
 
 ## DONE
  * dealt with functions that take more or less than 2 arguments
